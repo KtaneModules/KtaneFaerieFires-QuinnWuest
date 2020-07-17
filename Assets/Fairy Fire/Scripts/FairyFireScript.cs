@@ -111,7 +111,7 @@ public class FairyFireScript : MonoBehaviour
             var t = 200f;
             var x = Mathf.Cos(i * t + t) * 5f;
             var y = Mathf.Sin(i * t + t) * 5f;
-            shape.position = new Vector3(x, y, 1.5f);
+            shape.position = new Vector3(x, y, 10f);
             fairyFires[i].Play();
             yield return new WaitForSeconds(0.5f);
         }
