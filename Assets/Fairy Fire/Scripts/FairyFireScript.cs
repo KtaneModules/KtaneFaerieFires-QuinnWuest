@@ -22,10 +22,10 @@ public class FairyFireScript : MonoBehaviour
     static int moduleIdCounter = 1;
     bool moduleSolved = false;
     bool clockWise = true;
-    bool swapped = false;
     bool idle = true;
     bool animating = false;
     bool placerFinish = false;
+    string[] fG = new[] { "FairyGlitter1", "FairyGlitter2", "FairyGlitter3", "FairyGlitter4", "FairyGlitter5", "FairyGlitter6" };
 
     class Colors
     {
@@ -43,10 +43,8 @@ public class FairyFireScript : MonoBehaviour
         new Colors{Name = "Cyan", Color = new Color32(50, 225, 225, 255) },
         new Colors{Name = "Magenta", Color = new Color32(225, 50, 225, 255) },
     };
-    private Coroutine bigSwitch;
 
     Coroutine[] IdleSeq = new Coroutine[6];
-
 
     void Start()
     {
@@ -102,13 +100,13 @@ public class FairyFireScript : MonoBehaviour
     {
         for (var i = 0; i < 6; i++)
         {
-            Audio.PlaySoundAtTransform("FairyGlitter", transform);
+            Audio.PlaySoundAtTransform(fG[i], transform);
             fairyFires[i] = Instantiate(Emitter, transform.Find("Fairy Fires"));
             fairyFires[i].name = string.Format("{0} Fairy Fire", colors[i].Name);
             var main = fairyFires[i].main;
             var shape = fairyFires[i].shape;
             main.startColor = new ParticleSystem.MinMaxGradient(colors[i].Color);
-            var t = 200f;
+            var t = 200.015f;
             var x = Mathf.Cos(i * t + t) * 5f;
             var y = Mathf.Sin(i * t + t) * 5f;
             shape.position = new Vector3(x, y, 10f);
@@ -127,7 +125,6 @@ public class FairyFireScript : MonoBehaviour
             StartCoroutine(MoveToCorner(i));
             yield return new WaitForSeconds(.5f);
         }
-        StopCoroutine(bigSwitch);
     }
 
     private IEnumerator MoveToCorner(int pos)
