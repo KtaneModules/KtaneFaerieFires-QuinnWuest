@@ -112,10 +112,10 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 2
   moveWithCustomTransform: {fileID: 0}
-  scalingMode: 1
-  randomSeed: 273847599
+  scalingMode: 0
+  randomSeed: -1486999229
   InitialModule:
     serializedVersion: 3
     enabled: 1
@@ -2634,7 +2634,7 @@ ParticleSystem:
       type: 0
       properties: 0
   LightsModule:
-    enabled: 1
+    enabled: 0
     ratio: 1
     light: {fileID: 108746693580016358, guid: 850057406b3ef454899b13f23f18091f, type: 2}
     randomDistribution: 0
