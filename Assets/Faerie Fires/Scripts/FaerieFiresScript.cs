@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using KModkit;
 using UnityEngine;
 
@@ -53,9 +54,9 @@ public class FaerieFiresScript : MonoBehaviour
         for (int i = 0; i < 6; i++)
             FaerieFires.Add(new FaerieFire { Name = Name[i], Color = Color[i], Fire = new ParticleSystem(), Sound = Sound[i], Base36 = Base36[i], Base10 = Decode(Base36[i]), Order = Order[i] });
 
-        //Debug.LogFormat(@"[Faerie Fires #{0}] The following as been generated:", moduleId);
-        //for (int i = 0; i < FaerieFires.Count; i++)
-        //    Debug.LogFormat(@"[Faerie Fires #{0}] Color: {1} - Pitch: {2} - Base36: {3} - Base10: {4} - Median Difference: {5} - Order: {6}", moduleId, FaerieFires[i].Name, FaerieFires[i].Sound[13], FaerieFires[i].Base36, FaerieFires[i].Base10, MedianDifference(FaerieFires[i].Base10), FaerieFires[i].Order + 1);
+        Debug.LogFormat(@"[Faerie Fires #{0}] The following as been generated:", moduleId);
+        for (int i = 0; i < FaerieFires.Count; i++)
+            Debug.LogFormat(@"[Faerie Fires #{0}] Color: {1} - Pitch: {2} - Base36: {3} - Base10: {4} - Median Difference: {5} - Order: {6}", moduleId, FaerieFires[i].Name, FaerieFires[i].Sound[13], FaerieFires[i].Base36, FaerieFires[i].Base10, MedianDifference(FaerieFires[i].Base10), FaerieFires[i].Order + 1);
 
         for (int i = 0; i < FaerieSelectables.Length; i++)
             FaerieSelectables[i].gameObject.SetActive(false);
@@ -91,50 +92,6 @@ public class FaerieFiresScript : MonoBehaviour
 
         for (int i = 0; i < FaerieSelectables.Length; i++)
             FaerieSelectables[i].OnInteract += FaerieFirePressed(i);
-
-        if (UnityEngine.Random.Range(0, 11) == 0)
-        {
-            var color = UnityEngine.Random.Range(0, 11);
-
-            switch (color)
-            {
-                case 0:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] 1022 -> 120 -> 12 -> 1", moduleId);
-                    break;
-                case 1:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] What is always accessable on the module?", moduleId);
-                    break;
-                case 2:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] Module? Check.  - Pretty colors? Check.  - SN? Check.", moduleId);
-                    break;
-                case 3:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] 875 -> 12 -> 1", moduleId);
-                    break;
-                case 4:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] 555 -> 00 -> 0", moduleId);
-                    break;
-                case 5:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] 9 -> 9", moduleId);
-                    break;
-                case 6:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] 8754569 -> 121113 -> 11002 -> 0102 -> 112 -> 01 -> 1", moduleId);
-                    break;
-                case 7:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] Do Re Mi", moduleId);
-                    break;
-                case 8:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] 36 to 10", moduleId);
-                    break;
-                case 9:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] Timwi: 'Digital Root is bypassable since it's modulo 9. Don't use it'", moduleId);
-                    break;
-                case 10:
-                    Debug.LogFormat(@"[Faerie Fires #{0}] Remember Harmony Sequence?", moduleId);
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     KMSelectable.OnInteractHandler FaerieFirePressed(int btn)
@@ -387,5 +344,144 @@ public class FaerieFiresScript : MonoBehaviour
         }
         else
             return number;
+    }
+
+#pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"!{0} touch [Click the surface (Twice if the module hasn't started yet)] | !{0} 13-25-36[Click the top house at 3 seconds, the second house at 5 seconds and the third hourse at 6 seconds. Also touches the screen if the faeries aren't at home.]";
+#pragma warning restore 414
+    IEnumerator ProcessTwitchCommand(string command)
+    {
+        Match m;
+        if (moduleSolved)
+        {
+            yield return "sendtochaterror The module is already solved.";
+            yield break;
+        }
+        else if ((m = Regex.Match(command, @"^\s*([0123456789-]+)\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)).Success)
+        {
+            yield return null;
+
+            var cell = m.Groups[0].Value.Split('-');
+
+            for (int i = 0; i < cell.Length; i++)
+            {
+                if (Regex.IsMatch(cell[i], @"^\s*[123456][0123456789]\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+                    continue;
+                else
+                {
+                    yield return "sendtochaterror Incorrect syntax.";
+                    yield break;
+                }
+            }
+
+            var touch = false;
+            if (!placerFinish)
+            {
+                Surface.OnInteract();
+                while (animating)
+                {
+                    yield return true;
+                    yield return new WaitForSeconds(.05f);
+                }
+            }
+            for (int i = 0; i < FaerieSelectables.Length; i++)
+            {
+                if (!FaerieSelectables[i].gameObject.activeSelf)
+                {
+                    touch = true;
+                }
+            }
+            if (touch)
+            {
+                Surface.OnInteract();
+                for (int i = 0; i < FaerieSelectables.Length; i++)
+                {
+                    if (!FaerieSelectables[i].gameObject.activeSelf)
+                        while (!FaerieSelectables[i].gameObject.activeSelf)
+                        {
+                            yield return true;
+                            yield return new WaitForSeconds(.05f);
+                        }
+                }
+            }
+
+            for (int i = 0; i < cell.Length; i++)
+            {
+                var house = int.Parse(cell[i].Substring(0, 1));
+                var time = int.Parse(cell[i].Substring(1, 1));
+                while ((int) Bomb.GetTime() % 10 != time)
+                {
+                    yield return true;
+                    yield return new WaitForSeconds(.05f);
+                }
+                FaerieSelectables[house-1].OnInteract();
+            }
+            yield break;
+        }
+        else if (Regex.IsMatch(command, @"^\s*touch\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+            yield return null;
+            if (!placerFinish)
+            {
+                Surface.OnInteract();
+                while (animating)
+                {
+                    yield return true;
+                    yield return new WaitForSeconds(.05f);
+                }
+            }
+            Surface.OnInteract();
+            yield break;
+        }
+        else
+        {
+            yield return "sendtochaterror Invalid Command";
+            yield break;
+        }
+    }
+
+    IEnumerator TwitchHandleForcedSolve()
+    {
+        Debug.LogFormat(@"[Faerie Fires #{0}] Module was force solved by TP", moduleId);
+        var touch = false;
+        if (!placerFinish)
+        {
+            Surface.OnInteract();
+            while (animating)
+            {
+                yield return true;
+                yield return new WaitForSeconds(.05f);
+            }
+        }
+        for (int i = 0; i < FaerieSelectables.Length; i++)
+        {
+            if (!FaerieSelectables[i].gameObject.activeSelf)
+            {
+                touch = true;
+            }
+        }
+        if (touch)
+        {
+            Surface.OnInteract();
+            for (int i = 0; i < FaerieSelectables.Length; i++)
+            {
+                if (!FaerieSelectables[i].gameObject.activeSelf)
+                    while (!FaerieSelectables[i].gameObject.activeSelf)
+                    {
+                        yield return true;
+                        yield return new WaitForSeconds(.05f);
+                    }
+            }
+        }
+        for (int i = 0; i < FaerieFires.Count; i++)
+        {
+            while ((int) Bomb.GetTime() % 10 != MedianDifference(FaerieFires[FaerieFires.IndexOf((b) => b.Order == i)].Base10))
+            {
+                yield return true;
+                yield return new WaitForSeconds(.05f);
+            }
+            FaerieSelectables[FaerieFires.IndexOf((b) => b.Order == i)].OnInteract();
+        }
+        yield break;
     }
 }
