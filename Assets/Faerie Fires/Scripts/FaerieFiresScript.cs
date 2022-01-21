@@ -24,6 +24,7 @@ public class FaerieFiresScript : MonoBehaviour
     private bool placerFinish = false;
     private bool firstStart = true;
     private bool alreadyFalse = false;
+    private bool alreadyStarted = false;
     private int currentStage = 0;
     private Color32 transparent = new Color32(255, 255, 255, 25);
     private const string CharList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -114,6 +115,7 @@ public class FaerieFiresScript : MonoBehaviour
             currentStage++;
             animating = true;
             idleSeq[btn] = StartCoroutine(IdleSequence(btn, fromHouse: true));
+            alreadyStarted = true;
             if (currentStage == 6)
             {
                 moduleSolved = true;
@@ -387,21 +389,18 @@ public class FaerieFiresScript : MonoBehaviour
             for (int i = 0; i < FaerieSelectables.Length; i++)
             {
                 if (!FaerieSelectables[i].gameObject.activeSelf)
-                {
                     touch = true;
-                }
             }
-            if (touch)
+            if (touch && !alreadyStarted)
             {
                 Surface.OnInteract();
                 for (int i = 0; i < FaerieSelectables.Length; i++)
                 {
-                    if (!FaerieSelectables[i].gameObject.activeSelf)
-                        while (!FaerieSelectables[i].gameObject.activeSelf)
-                        {
-                            yield return true;
-                            yield return new WaitForSeconds(.05f);
-                        }
+                    while (!FaerieSelectables[i].gameObject.activeSelf)
+                    {
+                        yield return true;
+                        yield return new WaitForSeconds(.05f);
+                    }
                 }
             }
 
@@ -414,7 +413,7 @@ public class FaerieFiresScript : MonoBehaviour
                     yield return true;
                     yield return new WaitForSeconds(.05f);
                 }
-                FaerieSelectables[house-1].OnInteract();
+                FaerieSelectables[house - 1].OnInteract();
             }
             yield break;
         }
@@ -431,6 +430,7 @@ public class FaerieFiresScript : MonoBehaviour
                 }
             }
             Surface.OnInteract();
+            alreadyStarted = false;
             yield break;
         }
         else
