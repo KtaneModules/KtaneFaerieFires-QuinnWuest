@@ -55,7 +55,7 @@ public class FaerieFiresScript : MonoBehaviour
         for (int i = 0; i < 6; i++)
             FaerieFires.Add(new FaerieFire { Name = Name[i], Color = Color[i], Fire = new ParticleSystem(), Sound = Sound[i], Base36 = Base36[i], Base10 = Decode(Base36[i]), Order = Order[i] });
 
-        Debug.LogFormat(@"[Faerie Fires #{0}] The following as been generated:", moduleId);
+        Debug.LogFormat(@"[Faerie Fires #{0}] The following has been generated:", moduleId);
         for (int i = 0; i < FaerieFires.Count; i++)
             Debug.LogFormat(@"[Faerie Fires #{0}] Color: {1} - Pitch: {2} - Base36: {3} - Base10: {4} - Median Difference: {5} - Order: {6}", moduleId, FaerieFires[i].Name, FaerieFires[i].Sound[13], FaerieFires[i].Base36, FaerieFires[i].Base10, MedianDifference(FaerieFires[i].Base10), FaerieFires[i].Order + 1);
 
@@ -349,7 +349,7 @@ public class FaerieFiresScript : MonoBehaviour
     }
 
 #pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"!{0} touch [Click the surface (Twice if the module hasn't started yet)] | !{0} 13-25-36[Click the top house at 3 seconds, the second house at 5 seconds and the third hourse at 6 seconds. Also touches the screen if the faeries aren't at home.]";
+    private readonly string TwitchHelpMessage = @"!{0} touch [Click the surface (Twice if the module hasn't started yet)] | !{0} 13-25-36 [Click the top house at 3 seconds, the second house at 5 seconds and the third house at 6 seconds. Also touches the screen if the faeries aren't at home.]";
 #pragma warning restore 414
     IEnumerator ProcessTwitchCommand(string command)
     {
@@ -381,10 +381,7 @@ public class FaerieFiresScript : MonoBehaviour
             {
                 Surface.OnInteract();
                 while (animating)
-                {
                     yield return true;
-                    yield return new WaitForSeconds(.05f);
-                }
             }
             for (int i = 0; i < FaerieSelectables.Length; i++)
             {
@@ -397,10 +394,7 @@ public class FaerieFiresScript : MonoBehaviour
                 for (int i = 0; i < FaerieSelectables.Length; i++)
                 {
                     while (!FaerieSelectables[i].gameObject.activeSelf)
-                    {
                         yield return true;
-                        yield return new WaitForSeconds(.05f);
-                    }
                 }
             }
 
@@ -409,11 +403,9 @@ public class FaerieFiresScript : MonoBehaviour
                 var house = int.Parse(cell[i].Substring(0, 1));
                 var time = int.Parse(cell[i].Substring(1, 1));
                 while ((int) Bomb.GetTime() % 10 != time)
-                {
                     yield return true;
-                    yield return new WaitForSeconds(.05f);
-                }
                 FaerieSelectables[house - 1].OnInteract();
+                yield return new WaitForSeconds(.05f);
             }
             yield break;
         }
@@ -424,10 +416,7 @@ public class FaerieFiresScript : MonoBehaviour
             {
                 Surface.OnInteract();
                 while (animating)
-                {
                     yield return true;
-                    yield return new WaitForSeconds(.05f);
-                }
             }
             Surface.OnInteract();
             alreadyStarted = false;
@@ -448,17 +437,12 @@ public class FaerieFiresScript : MonoBehaviour
         {
             Surface.OnInteract();
             while (animating)
-            {
                 yield return true;
-                yield return new WaitForSeconds(.05f);
-            }
         }
         for (int i = 0; i < FaerieSelectables.Length; i++)
         {
             if (!FaerieSelectables[i].gameObject.activeSelf)
-            {
                 touch = true;
-            }
         }
         if (touch)
         {
@@ -467,20 +451,15 @@ public class FaerieFiresScript : MonoBehaviour
             {
                 if (!FaerieSelectables[i].gameObject.activeSelf)
                     while (!FaerieSelectables[i].gameObject.activeSelf)
-                    {
                         yield return true;
-                        yield return new WaitForSeconds(.05f);
-                    }
             }
         }
         for (int i = 0; i < FaerieFires.Count; i++)
         {
             while ((int) Bomb.GetTime() % 10 != MedianDifference(FaerieFires[FaerieFires.IndexOf((b) => b.Order == i)].Base10))
-            {
                 yield return true;
-                yield return new WaitForSeconds(.05f);
-            }
             FaerieSelectables[FaerieFires.IndexOf((b) => b.Order == i)].OnInteract();
+            yield return new WaitForSeconds(.05f);
         }
         yield break;
     }
