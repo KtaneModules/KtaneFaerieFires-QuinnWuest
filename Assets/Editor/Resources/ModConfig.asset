@@ -12,9 +12,12 @@ MonoBehaviour:
   m_Name: ModConfig
   m_EditorClassIdentifier: 
   id: FaerieFiresModule
-  title: Faerie Fires
+  title: Faerie Fires [REUPLOAD]
   author: Goofy
-  description: Follow the Faerie Fires and watch what they do.
+  description: "Follow the Faerie Fires and watch what they do.\n\nThis is a reupload
+    of Goofy's module with changes and bug fixes. Unsubscribe from the old version
+    here:\r\nhttps://steamcommunity.com/sharedfiles/filedetails/?id=2684988467\r\n\r\n[url=https://ktane.timwi.de/HTML/Faerie%20Fires.html]Manual
+    HTML[/url]\r\n[url=https://ktane.timwi.de/PDF/Faerie%20Fires.pdf]Manual PDF[/url]"
   version: 1.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 2fb7c9a641175fb43a37289a7bc9e797, type: 3}
